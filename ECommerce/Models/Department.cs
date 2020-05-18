@@ -13,6 +13,9 @@ namespace ECommerce.Models
 
         [Required(ErrorMessage = "The field {0} is required")]
         [MaxLength(50, ErrorMessage = "The field {0} must be maximum {1} characters length")]
+        [Display(Name = "Department")]
         public string Name { get; set; }
+
+        public virtual ICollection<City> Cities { get; set; }
     }
 }
