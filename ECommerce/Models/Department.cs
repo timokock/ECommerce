@@ -10,6 +10,7 @@ namespace ECommerce.Models
     {
         [Key]
         public int DepartmentID { get; set; }
+
         [Required(ErrorMessage = "The field {0} is required")]
         [MaxLength(50, ErrorMessage = "The field {0} must be maximum {1} characters length")]
         public string Name { get; set; }

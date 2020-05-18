@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<ECommerce.Models.Department>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Departments";
 }
 
-<h2>Index</h2>
+    <h2>Departments</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Create New", "Create", new { }, new { @class= "btn btn-primary" })
 </p>
 <table class="table">
     <tr>
