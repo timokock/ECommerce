@@ -40,7 +40,7 @@ namespace ECommerce.Controllers
         // GET: Cities/Create
         public ActionResult Create()
         {
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name");
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name");
             return View();
         }
         // POST: Cities/Create
@@ -71,10 +71,10 @@ namespace ECommerce.Controllers
                         ModelState.AddModelError(string.Empty, ex.Message);
                     }
                 }
-                ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
+                ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
                 return View(city);
             }
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
         }
 
@@ -90,7 +90,7 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
         }
 
@@ -107,7 +107,7 @@ namespace ECommerce.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
         }
 

@@ -31,7 +31,7 @@
         <td>
             @Html.ActionLink("Edit", "Edit", new { id=item.CityID }) |
             @Html.ActionLink("Details", "Details", new { id=item.CityID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.CityID })
+            @Html.ActionLink("Delete", "Delete", new { id=item.CityID }, new { @class = "text-danger" })
         </td>
     </tr>
 }

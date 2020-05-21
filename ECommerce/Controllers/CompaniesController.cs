@@ -40,8 +40,8 @@ namespace ECommerce.Controllers
         // GET: Companies/Create
         public ActionResult Create()
         {
-            ViewBag.CityID = new SelectList(CombosHelper.GetCities(), "CityID", "Name");
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name");
+            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name");
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name");
             return View();
         }
 
@@ -88,14 +88,14 @@ namespace ECommerce.Controllers
                     {
                         ModelState.AddModelError(string.Empty, ex.Message);
                     }
-                    ViewBag.CityID = new SelectList(CombosHelper.GetCities(), "CityID", "Name", company.CityID);
-                    ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
                     return View(company);
                 }
             }
 
-            ViewBag.CityID = new SelectList(CombosHelper.GetCities(), "CityID", "Name", company.CityID);
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
             return View(company);
         }
 
@@ -111,8 +111,8 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CityID = new SelectList(CombosHelper.GetCities(), "CityID", "Name", company.CityID);
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
             return View(company);
         }
 
@@ -138,8 +138,8 @@ namespace ECommerce.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CityID = new SelectList(CombosHelper.GetCities(), "CityID", "Name", company.CityID);
-            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
             return View(company);
         }
 

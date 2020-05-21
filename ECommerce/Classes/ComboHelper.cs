@@ -6,7 +6,7 @@ using System.Web;
 
 namespace ECommerce.Classes
 {
-    public class CombosHelper : IDisposable
+    public class ComboHelper : IDisposable
     {
         private static ECommerceDbContext db = new ECommerceDbContext();
 
@@ -30,6 +30,17 @@ namespace ECommerce.Classes
                 Name = "[Select a city...]"
             });
             return cities = cities.OrderBy(d => d.Name).ToList();
+        }
+
+        public static List<Company> GetCompanies()
+        {
+            var companies = db.Companies.ToList();
+            companies.Add(new Company
+            {
+                CompanyID = 0,
+                Name = "[Select a company...]"
+            });
+            return companies = companies.OrderBy(d => d.Name).ToList();
         }
 
         public void Dispose()
