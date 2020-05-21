@@ -10,6 +10,7 @@
 <div>
     <h4>City</h4>
     <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Department.Name)
@@ -29,7 +30,8 @@
 
     </dl>
 
-    @using (Html.BeginForm()) {
+    @using (Html.BeginForm())
+    {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">

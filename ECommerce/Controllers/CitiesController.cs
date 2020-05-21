@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using ECommerce.Classes;
 using ECommerce.Models;
 
 namespace ECommerce.Controllers
@@ -39,25 +40,41 @@ namespace ECommerce.Controllers
         // GET: Cities/Create
         public ActionResult Create()
         {
-            ViewBag.DepartmentID = new SelectList(db.Departments.OrderBy(d => d.Name), "DepartmentID", "Name");
+            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name");
             return View();
         }
-
         // POST: Cities/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CityID,Name,DepartmentID")] City city)
+        public ActionResult Create(City city)
         {
             if (ModelState.IsValid)
             {
                 db.Cities.Add(city);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException != null &&
+                       ex.InnerException.InnerException != null &&
+                       ex.InnerException.InnerException.Message.Contains("_Index"))
+                    {
+                        ModelState.AddModelError(string.Empty, "This value already exists");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                }
+                ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
+                return View(city);
             }
-
-            ViewBag.DepartmentID = new SelectList(db.Departments.OrderBy(d => d.Name), "DepartmentID", "Name", city.DepartmentID);
+            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
         }
 
@@ -73,7 +90,7 @@ namespace ECommerce.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.DepartmentID = new SelectList(db.Departments.OrderBy(d => d.Name), "DepartmentID", "Name", city.DepartmentID);
+            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
         }
 
@@ -90,7 +107,7 @@ namespace ECommerce.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.DepartmentID = new SelectList(db.Departments.OrderBy(d => d.Name), "DepartmentID", "Name", city.DepartmentID);
+            ViewBag.DepartmentID = new SelectList(CombosHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
         }
 
