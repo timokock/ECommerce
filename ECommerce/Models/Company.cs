@@ -17,12 +17,12 @@ namespace ECommerce.Models
         [Display(Name = "Company")]
         [Index("Department_Name_Index", IsUnique = true)]
         public string Name { get; set; }
-        
+
         [Required(ErrorMessage = "The field {0} is required")]
         [MaxLength(20, ErrorMessage = "The field {0} must be maximum {1} numbers length")]
         [DataType(DataType.PhoneNumber)]
-        public string Phone { get; set; }        
-        
+        public string Phone { get; set; }
+
         [Required(ErrorMessage = "The field {0} is required")]
         [MaxLength(100, ErrorMessage = "The field {0} must be maximum {1} characters length")]
         public string Address { get; set; }
@@ -46,5 +46,11 @@ namespace ECommerce.Models
         public virtual City City { get; set; }
 
         public virtual ICollection<User> Users { get; set; }
+
+        public virtual ICollection<Category> Categories { get; set; }
+
+        public virtual ICollection<Tax> Taxes { get; set; }
+
+        public virtual ICollection<Product> Products { get; set; }
     }
 }

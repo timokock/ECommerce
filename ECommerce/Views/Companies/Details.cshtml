@@ -55,12 +55,12 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Logo)
-        </dd>
+            <img src="@Url.Content(Model.Logo)" alt="Logo" style="width:100px;height:100px;max-width: 100%; height: auto;" class="img-thumbnail"/>
 
+        </dd>
     </dl>
-</div>
+    </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.CompanyID }) |
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Edit", "Edit", new { id = Model.CompanyID }, new { @class="btn btn-primary"}) 
+    @Html.ActionLink("Back to List", "Index", new { }, new { @class="btn btn-success"})
 </p>

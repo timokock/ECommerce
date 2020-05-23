@@ -11,6 +11,7 @@ using ECommerce.Models;
 
 namespace ECommerce.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CitiesController : Controller
     {
         private ECommerceDbContext db = new ECommerceDbContext();
@@ -52,9 +53,9 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Cities.Add(city);
                 try
                 {
+                    db.Cities.Add(city);
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
@@ -103,9 +104,27 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(city).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                try
+                {
+                    db.Entry(city).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException != null &&
+                       ex.InnerException.InnerException != null &&
+                       ex.InnerException.InnerException.Message.Contains("_Index"))
+                    {
+                        ModelState.AddModelError(string.Empty, "This value already exists");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                }
+                ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
+                return View(city);
             }
             ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", city.DepartmentID);
             return View(city);
@@ -132,9 +151,26 @@ namespace ECommerce.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             City city = db.Cities.Find(id);
-            db.Cities.Remove(city);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            try
+            {
+                db.Cities.Remove(city);
+                db.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null &&
+                   ex.InnerException.InnerException != null &&
+                   ex.InnerException.InnerException.Message.Contains("REFERENCE"))
+                {
+                    ModelState.AddModelError(string.Empty, "The record can not be deleted because it has related records");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+            return View(city);
         }
 
         protected override void Dispose(bool disposing)

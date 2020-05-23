@@ -11,6 +11,7 @@ using ECommerce.Models;
 
 namespace ECommerce.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private ECommerceDbContext db = new ECommerceDbContext();
@@ -55,31 +56,73 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Users.Add(user);
-                // TODO TryCatch
-                db.SaveChanges();
-                UserHelper.CreateUserASP(user.UserName, "user", user.UserName);
+                try
+                {
+                    db.Users.Add(user);
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException != null &&
+                       ex.InnerException.InnerException != null &&
+                       ex.InnerException.InnerException.Message.Contains("_Index"))
+                    {
+                        ModelState.AddModelError(string.Empty, "This value already exists");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", user.CityID);
+                    ViewBag.CompanyID = new SelectList(ComboHelper.GetCompanies(), "CompanyID", "Name", user.CompanyID);
+                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", user.DepartmentID);
+                    return View(user);
+                }
 
-                if (user.PhotoFile != null)
+                try
+                {
+                    UserHelper.CreateUserASP(user.UserName, "user", user.UserName);
+                }
+                catch (Exception ex)
+                {
+                    db.Users.Remove(user);
+                    db.SaveChanges();
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", user.CityID);
+                    ViewBag.CompanyID = new SelectList(ComboHelper.GetCompanies(), "CompanyID", "Name", user.CompanyID);
+                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", user.DepartmentID);
+                    return View(user);
+                }
+
+                try
                 {
                     var folder = "~/Content/Users";
                     var file = string.Format("{0}.jpg", user.UserID);
-                    var response = FileHelper.UploadPhoto(user.PhotoFile, folder, file);
-                    if (response)
+
+                    if (user.PhotoFile != null)
                     {
-                        var picURL = string.Format("{0}/{1}", folder, file);
-                        user.Photo = picURL;
-                        db.Entry(user).State = EntityState.Modified;
-                        //TODO TryCatch
-                        db.SaveChanges();
+                        var response = FileHelper.UploadPhoto(user.PhotoFile, folder, file);
+                        if (response)
+                        {
+                            var picURL = string.Format("{0}/{1}", folder, file);
+                            user.Photo = picURL;
+
+                            db.Entry(user).State = EntityState.Modified;
+                            db.SaveChanges();
+                        }
                     }
                 }
-                return RedirectToAction("Index");
+                catch (Exception ex)
+                {
+
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", user.CityID);
+                    ViewBag.CompanyID = new SelectList(ComboHelper.GetCompanies(), "CompanyID", "Name", user.CompanyID);
+                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", user.DepartmentID);
+                    return View(user);
+                }
             }
-            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", user.CityID);
-            ViewBag.CompanyID = new SelectList(ComboHelper.GetCompanies(), "CompanyID", "Name", user.CompanyID);
-            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", user.DepartmentID);
-            return View(user);
+            return RedirectToAction("Index");
         }
 
         // GET: Users/Edit/5
@@ -109,7 +152,29 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
+                var pic = string.Empty;
+                var folder = "~/Content/Users";
+                var file = string.Format("{0}.jpg", user.UserID);
+                var response = FileHelper.UploadPhoto(user.PhotoFile, folder, file);
+                
+                if (response)
+                {
+                    pic = string.Format("{0}/{1}", folder, file);
+                    user.Photo = pic;
+                }
+
+                var tempDBContext = new ECommerceDbContext();
+                var currentUser = tempDBContext.Users.Find(user.UserID);
+
+                if (currentUser.UserName != user.UserName)
+                {
+                    UserHelper.UpdateUserName(currentUser.UserName, user.UserName);
+                }
+                
+                tempDBContext.Dispose(); //Cerramos la conexión con la base de datos
+
                 db.Entry(user).State = EntityState.Modified;
+                //TODO TryCatch
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -126,7 +191,7 @@ namespace ECommerce.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            User user = db.Users.Find(id);
+            var user = db.Users.Find(id);
             if (user == null)
             {
                 return HttpNotFound();
@@ -139,9 +204,11 @@ namespace ECommerce.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            User user = db.Users.Find(id);
+            var user = db.Users.Find(id);
             db.Users.Remove(user);
+            //TODO TryCatch
             db.SaveChanges();
+            UserHelper.DeleteUser(user.UserName);
             return RedirectToAction("Index");
         }
 

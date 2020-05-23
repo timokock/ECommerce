@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using ECommerce.Models;
 
 namespace ECommerce.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class DepartmentsController : Controller
     {
         private ECommerceDbContext db = new ECommerceDbContext();
@@ -27,12 +25,19 @@ namespace ECommerce.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Department department = db.Departments.Find(id);
-            if (department == null)
+            else
             {
-                return HttpNotFound();
+                Department department = db.Departments.Find(id);
+            
+                if (department == null)
+                {
+                    return HttpNotFound();
+                }
+                else
+                {
+                    return View(department);
+                }
             }
-            return View(department);
         }
 
         // GET: Departments/Create
@@ -144,10 +149,12 @@ namespace ECommerce.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Department department = db.Departments.Find(id);
-            db.Departments.Remove(department);
+            
             try
             {
+                db.Departments.Remove(department);
                 db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
             catch (Exception ex)

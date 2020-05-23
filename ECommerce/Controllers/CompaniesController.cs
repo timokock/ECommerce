@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
@@ -11,6 +10,7 @@ using ECommerce.Models;
 
 namespace ECommerce.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CompaniesController : Controller
     {
         private ECommerceDbContext db = new ECommerceDbContext();
@@ -29,7 +29,9 @@ namespace ECommerce.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            
             Company company = db.Companies.Find(id);
+            
             if (company == null)
             {
                 return HttpNotFound();
@@ -54,10 +56,9 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-
-                db.Companies.Add(company);
                 try
                 {
+                    db.Companies.Add(company);
                     db.SaveChanges();
                     var folder = "~/Content/Logos";
                     var file = string.Format("{0}.jpg", company.CompanyID);
@@ -65,16 +66,26 @@ namespace ECommerce.Controllers
                     if (company.LogoFile != null)
                     {
                         var response = FileHelper.UploadPhoto(company.LogoFile, folder, file);
+
                         if(response)
                         {
                             var pic = string.Format("{0}/{1}", folder, file);
                             company.Logo = pic;
-                            db.Entry(company).State = EntityState.Modified;
-                            //TODO TRYCATCH
-                            db.SaveChanges();
+
+                            try
+                            {
+                                db.Entry(company).State = EntityState.Modified;
+                                db.SaveChanges();
+                            }
+                            catch (Exception ex)
+                            {
+                                ModelState.AddModelError(string.Empty, ex.Message);
+                            }
+                            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+                            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+                            return View(company);
                         }
                     }
-                    return RedirectToAction("Index");
                 }
                 catch (Exception ex)
                 {
@@ -93,10 +104,7 @@ namespace ECommerce.Controllers
                     return View(company);
                 }
             }
-
-            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
-            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
-            return View(company);
+            return RedirectToAction("Index");
         }
 
         // GET: Companies/Edit/5
@@ -129,18 +137,36 @@ namespace ECommerce.Controllers
                 var folder = "~/Content/Logos";
                 var file = string.Format("{0}.jpg", company.CompanyID);
                 var response = FileHelper.UploadPhoto(company.LogoFile, folder, file);
+                
                 if (response)
                 {
                     pic = string.Format("{0}/{1}", folder, file);
                     company.Logo = pic;
                 }
-                db.Entry(company).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                
+                try
+                {
+                    db.Entry(company).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException != null &&
+                        ex.InnerException.InnerException != null &&
+                        ex.InnerException.InnerException.Message.Contains("_Index"))
+                    {
+                        ModelState.AddModelError(string.Empty, "This value already exists");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+                    return View(company);
+                }
             }
-            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
-            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
-            return View(company);
+            return RedirectToAction("Index");
         }
 
         // GET: Companies/Delete/5
@@ -164,8 +190,26 @@ namespace ECommerce.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             Company company = db.Companies.Find(id);
-            db.Companies.Remove(company);
-            db.SaveChanges();
+            
+            try
+            {
+                db.Companies.Remove(company);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null &&
+                   ex.InnerException.InnerException != null &&
+                   ex.InnerException.InnerException.Message.Contains("REFERENCE"))
+                {
+                    ModelState.AddModelError(string.Empty, "The record can not be deleted because it has related records");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                return View(company);
+            }
             return RedirectToAction("Index");
         }
 

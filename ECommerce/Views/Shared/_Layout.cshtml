@@ -24,10 +24,29 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("Departments", "Index", "Departments")</li>
-                    <li>@Html.ActionLink("Cities", "Index", "Cities")</li>
-                    <li>@Html.ActionLink("Companies", "Index", "Companies")</li>
-                    <li>@Html.ActionLink("Users", "Index", "Users")</li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Cities", "Index", "Cities")</li>
+                                <li>@Html.ActionLink("Companies", "Index", "Companies")</li>
+                                <li>@Html.ActionLink("Departments", "Index", "Departments")</li>
+                                <li>@Html.ActionLink("Users", "Index", "Users")</li>
+                            </ul>
+                        </li>
+                    }
+                    @if (User.IsInRole("User"))
+                    {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">File<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Categories", "Index", "Categories")</li>
+                                <li>@Html.ActionLink("Products", "Index", "Products")</li>
+                                <li>@Html.ActionLink("Taxes", "Index", "Taxes")</li>
+                            </ul>
+                        </li>
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
