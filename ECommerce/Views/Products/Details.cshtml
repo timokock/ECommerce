@@ -63,7 +63,7 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Image)
+            <img src="@Url.Content(Model.Image)" alt="Logo" style="width:100px;height:100px;max-width: 100%; height: auto;" class="img-thumbnail" id="img" />
         </dd>
 
         <dt>
@@ -77,6 +77,6 @@
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ProductID }) |
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ProductID }, new { @class="btn btn-primary"}) 
+    @Html.ActionLink("Back to List", "Index", new { }, new { @class="btn btn-success"})
 </p>

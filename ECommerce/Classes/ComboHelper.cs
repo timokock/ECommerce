@@ -1,5 +1,6 @@
 ﻿using ECommerce.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,6 +41,28 @@ namespace ECommerce.Classes
                 Name = "[Select a company...]"
             });
             return companies = companies.OrderBy(d => d.Name).ToList();
+        }
+
+        public static List<Category> GetCategories(int companyID)
+        {
+            var categories = db.Categories.Where(c => c.CompanyID == companyID).ToList();
+            categories.Add(new Category
+            {
+                CategoryID = 0,
+                Description = "[Select a category...]"
+            });
+            return categories = categories.OrderBy(d => d.Description).ToList();
+        }
+
+        public static List<Tax> GetTaxes(int companyID)
+        {
+            var taxes = db.Taxes.Where(t => t.CompanyID == companyID).ToList();
+            taxes.Add(new Tax
+            {
+                TaxID = 0,
+                Description = "[Select a tax...]"
+            });
+            return taxes = taxes.OrderBy(d => d.Description).ToList();
         }
 
         public void Dispose()

@@ -1,8 +1,12 @@
 ﻿
+using System;
+using System.Collections;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using ECommerce.Classes;
 using ECommerce.Models;
 
 namespace ECommerce.Controllers
@@ -15,7 +19,9 @@ namespace ECommerce.Controllers
         // GET: Products
         public ActionResult Index()
         {
-            var products = db.Products.Include(p => p.Category).Include(p => p.Company).Include(p => p.Tax);
+            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var products = db.Products.Include(p => p.Category).Include(p => p.Tax).Where(p => p.CompanyID == user.CompanyID);
+
             return View(products.ToList());
         }
 
@@ -26,78 +32,155 @@ namespace ECommerce.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Products.Find(id);
+
+            var product = db.Products.Find(id);
+            
             if (product == null)
             {
                 return HttpNotFound();
             }
+
             return View(product);
         }
 
         // GET: Products/Create
         public ActionResult Create()
         {
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "Description");
-            ViewBag.CompanyID = new SelectList(db.Companies, "CompanyID", "Name");
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Description");
-            return View();
+            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            
+            ViewBag.CategoryID = new SelectList(ComboHelper.GetCategories(user.CompanyID), "CategoryID", "Description");
+            ViewBag.TaxID = new SelectList(ComboHelper.GetTaxes(user.CompanyID), "TaxID", "Description");
+
+            var product = new Product { CompanyID = user.CompanyID };
+
+            return View(product);
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ProductID,CompanyID,Description,BarCode,CategoryID,TaxID,Price,Image,Remarks")] Product product)
+        public ActionResult Create(Product product)
         {
+            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+
+            product.CompanyID = user.CompanyID;
+            
             if (ModelState.IsValid)
             {
-                db.Products.Add(product);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
+                try
+                {
+                    db.Products.Add(product);
+                    db.SaveChanges();
 
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "Description", product.CategoryID);
-            ViewBag.CompanyID = new SelectList(db.Companies, "CompanyID", "Name", product.CompanyID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Description", product.TaxID);
+                    if (product.ImageFile != null)
+                    {
+                        var folder = "~/Content/Products";
+                        var file = string.Format("{0}.jpg", product.ProductID);
+                        var response = FileHelper.UploadPhoto(product.ImageFile, folder, file);
+
+                        if (response)
+                        {
+                            var pic = string.Format("{0}/{1}", folder, file);
+                            product.Image = pic;
+
+                            try
+                            {
+                                db.Entry(product).State = EntityState.Modified;
+                                db.SaveChanges();
+                            }
+                            catch (Exception ex)
+                            {
+                                ModelState.AddModelError(string.Empty, ex.Message);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        product.Image = "~/Content/Products/no_img.jpg";
+                        try
+                        {
+                            db.Entry(product).State = EntityState.Modified;
+                            db.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                            ModelState.AddModelError(string.Empty, ex.Message);
+                        }
+                    }
+                    return RedirectToAction("Index");
+                }
+                catch (Exception ex)
+                {
+                    if (ex.InnerException != null &&
+                       ex.InnerException.InnerException != null &&
+                       ex.InnerException.InnerException.Message.Contains("_Index"))
+                    {
+                        ModelState.AddModelError(string.Empty, "This value already exists");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                }
+                ViewBag.CategoryID = new SelectList(ComboHelper.GetCategories(user.CompanyID), "CategoryID", "Description");
+                ViewBag.TaxID = new SelectList(ComboHelper.GetTaxes(user.CompanyID), "TaxID", "Description");
+                return View(product);
+            }
+            ViewBag.CategoryID = new SelectList(ComboHelper.GetCategories(user.CompanyID), "CategoryID", "Description");
+            ViewBag.TaxID = new SelectList(ComboHelper.GetTaxes(user.CompanyID), "TaxID", "Description");
             return View(product);
         }
 
         // GET: Products/Edit/5
         public ActionResult Edit(int? id)
         {
+            
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Products.Find(id);
+            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+            var product = db.Products.Find(id);
+
             if (product == null)
             {
                 return HttpNotFound();
             }
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "Description", product.CategoryID);
-            ViewBag.CompanyID = new SelectList(db.Companies, "CompanyID", "Name", product.CompanyID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Description", product.TaxID);
+            ViewBag.CategoryID = new SelectList(ComboHelper.GetCategories(product.CompanyID), "CategoryID", "Description", product.CategoryID);
+            ViewBag.TaxID = new SelectList(ComboHelper.GetTaxes(product.CompanyID), "TaxID", "Description", product.TaxID);
             return View(product);
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductID,CompanyID,Description,BarCode,CategoryID,TaxID,Price,Image,Remarks")] Product product)
+        public ActionResult Edit(Product product)
         {
+            
             if (ModelState.IsValid)
             {
-                db.Entry(product).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (product.ImageFile != null)
+                {
+                    var folder = "~/Content/Products";
+                    var file = string.Format("{0}.jpg", product.ProductID);
+                    var response = FileHelper.UploadPhoto(product.ImageFile, folder, file);
+
+                    if (response)
+                    {   
+                        product.Image = string.Format("{0}/{1}", folder, file);
+                    } 
+                }
+                else
+                {
+                    product.Image = product.Image;
+
+
+                }
             }
-            ViewBag.CategoryID = new SelectList(db.Categories, "CategoryID", "Description", product.CategoryID);
-            ViewBag.CompanyID = new SelectList(db.Companies, "CompanyID", "Name", product.CompanyID);
-            ViewBag.TaxID = new SelectList(db.Taxes, "TaxID", "Description", product.TaxID);
-            return View(product);
+
+            db.Entry(product).State = EntityState.Modified;
+            db.SaveChanges();
+            return RedirectToAction("Index");
         }
 
         // GET: Products/Delete/5
@@ -107,11 +190,14 @@ namespace ECommerce.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Product product = db.Products.Find(id);
+            
+            var product = db.Products.Find(id);
+            
             if (product == null)
             {
                 return HttpNotFound();
             }
+            
             return View(product);
         }
 
@@ -120,10 +206,29 @@ namespace ECommerce.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Product product = db.Products.Find(id);
-            db.Products.Remove(product);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            var product = db.Products.Find(id);
+            
+            if(product != null)
+            {
+                try
+                {
+                    var response = FileHelper.DeletePhoto(product.Image);
+                    
+                    if (response)
+                    {
+                        db.Products.Remove(product);
+                        db.SaveChanges();
+                        return RedirectToAction("Index");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+            ViewBag.CategoryID = new SelectList(ComboHelper.GetCategories(product.CompanyID), "CategoryID", "Description", product.CategoryID);
+            ViewBag.TaxID = new SelectList(ComboHelper.GetTaxes(product.CompanyID), "TaxID", "Description", product.TaxID);
+            return View(product);
         }
 
         protected override void Dispose(bool disposing)
@@ -132,6 +237,7 @@ namespace ECommerce.Controllers
             {
                 db.Dispose();
             }
+            
             base.Dispose(disposing);
         }
     }

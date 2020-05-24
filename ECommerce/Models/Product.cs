@@ -16,7 +16,7 @@ namespace ECommerce.Models
         [Range(1, double.MaxValue, ErrorMessage = "You must select a {0}")]
         [Index("Product_CompanyID_Description_Index", 1, IsUnique = true)]
         [Index("Product_CompanyID_BarCode_Index", 1, IsUnique = true)]
-        [Display(Name = "Commpany")]
+        [Display(Name = "Company")]
         public int CompanyID { get; set; }
 
         [Required(ErrorMessage = "The field {0} is required")]
@@ -47,6 +47,7 @@ namespace ECommerce.Models
         public decimal Price { get; set; }
 
         [DataType(DataType.ImageUrl)]
+        [Display(Name ="Image")]
         public string Image { get; set; }
 
         [NotMapped] // No mandamos a base de datos

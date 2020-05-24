@@ -25,7 +25,7 @@ namespace ECommerce.Models
 
         [Required(ErrorMessage = "The field {0} is required")]
         [Range(1, double.MaxValue, ErrorMessage = "You must select a {0}")]
-        [Display(Name = "Commpany")]
+        [Display(Name = "Company")]
         [Index("Tax_CompanyID_Description_Index", 1, IsUnique = true)]
         public int CompanyID { get; set; }
 

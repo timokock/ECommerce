@@ -60,22 +60,23 @@ namespace ECommerce.Controllers
                 {
                     db.Companies.Add(company);
                     db.SaveChanges();
-                    var folder = "~/Content/Logos";
-                    var file = string.Format("{0}.jpg", company.CompanyID);
 
                     if (company.LogoFile != null)
                     {
+                        var folder = "~/Content/Logos";
+                        var file = string.Format("{0}.jpg", company.CompanyID);
+
                         var response = FileHelper.UploadPhoto(company.LogoFile, folder, file);
 
                         if(response)
                         {
-                            var pic = string.Format("{0}/{1}", folder, file);
-                            company.Logo = pic;
+                            company.Logo = string.Format("{0}/{1}", folder, file);
 
                             try
                             {
                                 db.Entry(company).State = EntityState.Modified;
                                 db.SaveChanges();
+                                return RedirectToAction("Index");
                             }
                             catch (Exception ex)
                             {
@@ -99,12 +100,11 @@ namespace ECommerce.Controllers
                     {
                         ModelState.AddModelError(string.Empty, ex.Message);
                     }
-                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
-                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
-                    return View(company);
                 }
             }
-            return RedirectToAction("Index");
+            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+            return View(company);
         }
 
         // GET: Companies/Edit/5
@@ -115,6 +115,7 @@ namespace ECommerce.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             var company = db.Companies.Find(id);
+            
             if (company == null)
             {
                 return HttpNotFound();
@@ -133,37 +134,39 @@ namespace ECommerce.Controllers
         {
             if (ModelState.IsValid)
             {
-                var pic = string.Empty;
-                var folder = "~/Content/Logos";
-                var file = string.Format("{0}.jpg", company.CompanyID);
-                var response = FileHelper.UploadPhoto(company.LogoFile, folder, file);
-                
-                if (response)
+                if (company.LogoFile != null)
                 {
-                    pic = string.Format("{0}/{1}", folder, file);
-                    company.Logo = pic;
-                }
-                
-                try
-                {
-                    db.Entry(company).State = EntityState.Modified;
-                    db.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    if (ex.InnerException != null &&
-                        ex.InnerException.InnerException != null &&
-                        ex.InnerException.InnerException.Message.Contains("_Index"))
+                    var folder = "~/Content/Logos";
+                    var file = string.Format("{0}.jpg", company.CompanyID);
+                    var response = FileHelper.UploadPhoto(company.LogoFile, folder, file);
+
+                    if (response)
                     {
-                        ModelState.AddModelError(string.Empty, "This value already exists");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                    ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
-                    ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
-                    return View(company);
+                        company.Logo = string.Format("{0}/{1}", folder, file);
+
+                        try
+                        {
+                            db.Entry(company).State = EntityState.Modified;
+                            db.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex.InnerException != null &&
+                                ex.InnerException.InnerException != null &&
+                                ex.InnerException.InnerException.Message.Contains("_Index"))
+                            {
+                                ModelState.AddModelError(string.Empty, "This value already exists");
+                            }
+                            else
+                            {
+                                ModelState.AddModelError(string.Empty, ex.Message);
+                            }
+                            
+                            ViewBag.CityID = new SelectList(ComboHelper.GetCities(), "CityID", "Name", company.CityID);
+                            ViewBag.DepartmentID = new SelectList(ComboHelper.GetDepartments(), "DepartmentID", "Name", company.DepartmentID);
+                            return View(company);
+                        }
+                    } 
                 }
             }
             return RedirectToAction("Index");

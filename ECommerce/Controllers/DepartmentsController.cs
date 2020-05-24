@@ -73,10 +73,9 @@ namespace ECommerce.Controllers
                     {
                         ModelState.AddModelError(string.Empty, ex.Message);
                     }
+                    return View(department);
                 }
-                return View(department);
             }
-
             return View(department);
         }
 

@@ -310,6 +310,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\Logos\" />
+    <Folder Include="Content\Products\" />
     <Folder Include="Content\Users\" />
   </ItemGroup>
   <ItemGroup>

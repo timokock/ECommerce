@@ -12,28 +12,28 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Department.Name)
+            @Html.DisplayNameFor(model => model.Name)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.Department.Name)
         </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Department.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.CityID }) |
-            @Html.ActionLink("Details", "Details", new { id=item.CityID }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.CityID }, new { @class = "text-danger" })
-        </td>
-    </tr>
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Department.Name)
+    </td>
+    <td>
+        @Html.ActionLink("Edit", "Edit", new { id = item.CityID }) |
+        @Html.ActionLink("Details", "Details", new { id = item.CityID }) |
+        @Html.ActionLink("Delete", "Delete", new { id = item.CityID }, new { @class = "text-danger" })
+    </td>
+</tr>
 }
 
 </table>

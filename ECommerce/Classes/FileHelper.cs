@@ -36,5 +36,39 @@ namespace ECommerce.Classes
                 return false;
             }
         }
+        public static bool UpdatePhoto(string name)
+        {
+            try
+            {
+                var file = new FileInfo(HttpContext.Current.Server.MapPath(name));
+                if (!file.Exists)
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public static bool DeletePhoto(string name)
+        {
+            try
+            {
+                var file = new FileInfo(HttpContext.Current.Server.MapPath(name));
+                if (!file.Exists)
+                {
+                    return false;
+                }
+                file.Delete();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
