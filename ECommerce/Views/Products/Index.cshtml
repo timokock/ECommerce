@@ -30,7 +30,7 @@
             @Html.DisplayNameFor(model => model.Image)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Remarks)
+            @Html.DisplayNameFor(model => model.Stock)
         </th>
         <th></th>
     </tr>
@@ -58,8 +58,8 @@
             <img src="@Url.Content(item.Image)" alt="Logo" style="width:100px;height:150px;max-width: 100%; height: auto;" />
         }
     </td>
-    <td>
-        @Html.DisplayFor(modelItem => item.Remarks)
+    <td align="right">
+        @Html.DisplayFor(modelItem => item.Stock)
     </td>
     <td>
         @Html.ActionLink("Edit", "Edit", new { id = item.ProductID }) |

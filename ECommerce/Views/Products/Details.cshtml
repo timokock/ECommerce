@@ -6,77 +6,117 @@
 
 <h2>Details</h2>
 
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Category.Description)
-        </dt>
+<div class="row">
+    <div class="col-md-6">
+        <div>
+            <h4>Product</h4>
+            <hr />
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.Category.Description)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Category.Description)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.Category.Description)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Company.Name)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Company.Name)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Company.Name)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.Company.Name)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Tax.Description)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Tax.Description)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Tax.Description)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.Tax.Description)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.BarCode)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.BarCode)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.BarCode)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.BarCode)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Price)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Price)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.Price)
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Image)
+                </dt>
 
-        <dd>
-            <img src="@Url.Content(Model.Image)" alt="Logo" style="width:100px;height:100px;max-width: 100%; height: auto;" class="img-thumbnail" id="img" />
-        </dd>
+                <dd>
+                    <img src="@Url.Content(Model.Image)" alt="Logo" style="width:100px;height:100px;max-width: 100%; height: auto;" class="img-thumbnail" id="img" />
+                </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Remarks)
-        </dt>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Remarks)
+                </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Remarks)
-        </dd>
+                <dd>
+                    @Html.DisplayFor(model => model.Remarks)
+                </dd>
 
-    </dl>
+            </dl>
+        </div>
+        <p>
+            @Html.ActionLink("Edit", "Edit", new { id = Model.ProductID }, new { @class = "btn btn-primary" })
+            @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-success" })
+        </p>
+    </div>
+    <div class="col-md-6">
+        <h4>Inventory</h4>
+        <hr />
+        @if (Model.Inventories.Count == 0)
+        {
+            <h5>Product stock is empty. No inventories available yet.</h5>
+        }
+        else
+        {
+    <table class="table">
+        <tr>
+            <th>Warehouse</th>
+            <th>Stock</th>
+        </tr>
+        @foreach (var item in Model.Inventories.ToList())
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WareHouse.Name)
+                </td>
+                <td align="right">
+                    @Html.DisplayFor(modelItem => item.Stock)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                <strong>Total</strong>
+            </td>
+            <td align="right">
+                <strong>@Html.DisplayFor(model => model.Stock)</strong>
+            </td>
+        </tr>
+    </table>
+        }
+    </div>
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ProductID }, new { @class="btn btn-primary"}) 
-    @Html.ActionLink("Back to List", "Index", new { }, new { @class="btn btn-success"})
-</p>
