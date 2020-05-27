@@ -10,125 +10,108 @@ using ECommerce.Models;
 
 namespace ECommerce.Controllers
 {
-    [Authorize(Roles = "User")]
-    public class CategoriesController : Controller
+    [Authorize(Roles ="Admin")]
+    public class StatesController : Controller
     {
         private ECommerceDbContext db = new ECommerceDbContext();
 
-        public CategoriesController()
-        {
-        }
-
-        // GET: Categories
+        // GET: States
         public ActionResult Index()
         {
-            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-
-            //if (user == null)
-            //{
-            //    return RedirectToAction("Index", "Home");
-            //}
-            //var categories = db.Categories.Include(c => c.Company);
-            var categories = db.Categories.Where(c => c.CompanyID == user.CompanyID);
-            return View(categories.ToList());
+            return View(db.States.ToList());
         }
 
-        // GET: Categories/Details/5
+        // GET: States/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = db.Categories.Find(id);
-            if (category == null)
+            State state = db.States.Find(id);
+            if (state == null)
             {
                 return HttpNotFound();
             }
-            return View(category);
+            return View(state);
         }
 
-        // GET: Categories/Create
+        // GET: States/Create
         public ActionResult Create()
         {
-            var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
-            
-            if (user == null)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            var category = new Category { CompanyID = user.CompanyID  };
-
-            return View(category);
+            return View();
         }
 
-        // POST: Categories/Create
+        // POST: States/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Category category)
+        public ActionResult Create([Bind(Include = "StateId,Description")] State state)
         {
             if (ModelState.IsValid)
             {
-                db.Categories.Add(category);
+                db.States.Add(state);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(category);
+
+            return View(state);
         }
 
-        // GET: Categories/Edit/5
+        // GET: States/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = db.Categories.Find(id);
-            if (category == null)
+            State state = db.States.Find(id);
+            if (state == null)
             {
                 return HttpNotFound();
             }
-            return View(category);
+            return View(state);
         }
 
-        // POST: Categories/Edit/5
+        // POST: States/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Category category)
+        public ActionResult Edit([Bind(Include = "StateId,Description")] State state)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(category).State = EntityState.Modified;
+                db.Entry(state).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.CompanyID = new SelectList(db.Companies, "CompanyID", "Name", category.CompanyID);
-            return View(category);
+            return View(state);
         }
 
-        // GET: Categories/Delete/5
+        // GET: States/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Category category = db.Categories.Find(id);
-            if (category == null)
+            State state = db.States.Find(id);
+            if (state == null)
             {
                 return HttpNotFound();
             }
-            return View(category);
+            return View(state);
         }
 
-        // POST: Categories/Delete/5
+        // POST: States/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Category category = db.Categories.Find(id);
-            db.Categories.Remove(category);
+            State state = db.States.Find(id);
+            db.States.Remove(state);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

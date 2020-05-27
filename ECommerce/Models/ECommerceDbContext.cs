@@ -37,5 +37,15 @@ namespace ECommerce.Models
         public DbSet<Warehouse> Warehouses { get; set; }
 
         public DbSet<Inventory> Inventories { get; set; }
+
+        public DbSet<Customer> Customers { get; set; }
+
+        public DbSet<State> States { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderDetail> OrderDetails { get; set; }
+
+        public DbSet<OrderDetailTmp> OrderDetailTmps { get; set; }
     }
 }

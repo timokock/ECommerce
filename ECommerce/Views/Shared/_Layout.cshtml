@@ -24,6 +24,7 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+
                     @if (User.IsInRole("Admin"))
                     {
                         <li class="dropdown">
@@ -32,19 +33,29 @@
                                 <li>@Html.ActionLink("Cities", "Index", "Cities")</li>
                                 <li>@Html.ActionLink("Companies", "Index", "Companies")</li>
                                 <li>@Html.ActionLink("Departments", "Index", "Departments")</li>
+                                <li>@Html.ActionLink("States", "Index", "States")</li>
                                 <li>@Html.ActionLink("Users", "Index", "Users")</li>
                             </ul>
                         </li>
                     }
+
                     @if (User.IsInRole("User"))
                     {
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">File<b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li>@Html.ActionLink("Categories", "Index", "Categories")</li>
+                                <li>@Html.ActionLink("Customers", "Index", "Customers")</li>
+                                <li>@Html.ActionLink("Orders", "Index", "Orders")</li>
                                 <li>@Html.ActionLink("Products", "Index", "Products")</li>
                                 <li>@Html.ActionLink("Taxes", "Index", "Taxes")</li>
                                 <li>@Html.ActionLink("Warehouses", "Index", "Warehouses")</li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Movements<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Orders", "Index", "Orders")</li>
                             </ul>
                         </li>
                     }
