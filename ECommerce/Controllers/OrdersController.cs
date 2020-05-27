@@ -58,18 +58,22 @@ namespace ECommerce.Controllers
         // POST: Orders/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Order order)
+        public ActionResult Create(NewOrderView view)
         {
             if (ModelState.IsValid)
             {
-                db.Orders.Add(order);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                var response = MovementHelper.NewOrder(view, User.Identity.Name);
+                if (response.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+                ModelState.AddModelError(string.Empty, response.Message);
             }
 
             var user = db.Users.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
             ViewBag.CustomerID = new SelectList(ComboHelper.GetCustomers(user.CompanyID), "CustomerID", "FullName");
-            return View(order);
+            view.Details = db.OrderDetailTmps.Where(odtmp => odtmp.UserName == User.Identity.Name).ToList();
+            return View(view);
         }
 
         // GET: Orders/AddProducts
